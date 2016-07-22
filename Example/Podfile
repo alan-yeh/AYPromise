@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'AYPromise_Example' do
+  pod 'AYPromise', :path => '../'
+
+  target 'AYPromise_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

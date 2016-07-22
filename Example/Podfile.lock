@@ -1,0 +1,16 @@
+PODS:
+  - AYPromise (1.0.0)
+
+DEPENDENCIES:
+  - AYPromise (from `../`)
+
+EXTERNAL SOURCES:
+  AYPromise:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  AYPromise: 716ef1bbe2c6db978ceb3b1f2d8484f25df2cf12
+
+PODFILE CHECKSUM: 6e0270353a9b3f48982dd61cbbf7e0e7648b456a
+
+COCOAPODS: 1.0.1
