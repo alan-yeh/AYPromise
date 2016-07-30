@@ -243,4 +243,33 @@
     });
     [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
 }
+
+- (NSString *)testFirst{
+    return @"World";
+}
+
+- (NSString *)testInvocation:(NSString *)arg{
+    return [@"Hello, " stringByAppendingString:arg];
+}
+
+- (NSString *)testCatch:(NSError *)error{
+    return error.localizedDescription;
+}
+
+- (void)testThenInvocation{
+    id ex1 = [self expectationWithDescription:@""];
+    AYPromiseWith(NSInvocationMake(self, @selector(testFirst)))
+    .then(NSInvocationMake(self, @selector(testInvocation:)))
+    .then(^(NSString *str){
+        XCTAssert([str isEqualToString:@"Hello, World"]);
+        @throw NSErrorMake(nil, @"Test Error");
+    }).catch(NSInvocationMake(self, @selector(testCatch:)))
+    .then(^(NSString *arg){
+        XCTAssert(@"Test Error");
+    }).always(^{
+        [ex1 fulfill];
+    });
+    [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
+}
+
 @end

@@ -11,10 +11,12 @@
 
 #define isError(obj) [obj isKindOfClass:[NSError class]]
 #define isPromise(obj) [obj isKindOfClass:[AYPromise class]]
+#define isInvocation(obj) [obj isKindOfClass:[NSInvocation class]]
 #define isBlock(obj) [obj isKindOfClass:NSClassFromString(@"NSBlock")]
 #define isArray(obj) [obj isKindOfClass:[NSArray class]]
 
 NSString * const AYPromiseInternalErrorsKey = @"AYPromiseInternalErrorsKey";
+
 NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...){
     static NSString *domain = nil;
     static dispatch_once_t onceToken;
@@ -32,6 +34,15 @@ NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription
                                                                  NSLocalizedDescriptionKey: desc,
                                                                  AYPromiseInternalErrorsKey: internalErrors ?: [NSNull null]
                                                                  }];
+}
+
+NSInvocation *NSInvocationMake(id target, SEL action){
+    NSCParameterAssert([target respondsToSelector:action]);
+    
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:action]];
+    invocation.target = target;
+    invocation.selector = action;
+    return invocation;
 }
 
 /**
@@ -85,19 +96,29 @@ static NSMethodSignature *_signatureForBlock(id block) {
     return nil;
 }
 
-static id _call_block(id block, id args){
-    NSMethodSignature *signature = _signatureForBlock(block);
+static id __execute__(id target, id args){
+    NSCParameterAssert(isBlock(target) || isInvocation(target));
+    
+    NSMethodSignature *signature;
+    NSInvocation *invocation;
+    
+    if (isBlock(target)) {
+        signature = _signatureForBlock(target);
+        invocation = [NSInvocation invocationWithMethodSignature:signature];
+        [invocation setTarget:target];
+        if (args && signature.numberOfArguments > 1) {
+            [invocation setArgument:&args atIndex:1];
+        }
+    }else{
+        signature = [target methodSignature];
+        invocation = target;
+        if (args && signature.numberOfArguments > 2) {
+            [invocation setArgument:&args atIndex:2];
+        }
+    }
     
     const char returnType = signature.methodReturnType[0];
-    if (returnType != '@' && returnType != 'v') {
-        [NSException raise:NSInvalidArgumentException format:@"AYPromise无法处理非对象返回值，block返回值必须是OC对象"];
-    }
-    
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setTarget:[block copy]];
-    if (args && signature.numberOfArguments > 1) {
-        [invocation setArgument:&args atIndex:1];
-    }
+    NSCAssert(returnType == '@' || returnType == 'v', @"AYPromise无法处理非对象返回值，返回值必须是OC对象");
     
     @try {
         [invocation invoke];
@@ -232,7 +253,7 @@ static inline AYPromise *__then(AYPromise *self, dispatch_queue_t queue, id bloc
             resolver(result);
         }else{
             dispatch_async(queue, ^{
-                resolver(_call_block(block, result));
+                resolver(__execute__(block, result));
             });
         }
     });
@@ -244,7 +265,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
     return __pipe(self, ^(id result, PSResolve resolver) {
         if (isError(result)) {
             dispatch_async(queue, ^{
-                resolver(_call_block(block, result));
+                resolver(__execute__(block, result));
             });
         }else{
             resolver(result);
@@ -322,45 +343,45 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 
 - (AYPromise *(^)(id))then{
     return ^id(id value){
-        if (isBlock(value)) {
+        if (isBlock(value) || isInvocation(value)) {
             return __then(self, dispatch_get_main_queue(), value);
         }else if (isPromise(value)){
             return __then(self, dispatch_get_main_queue(), ^{
                 return value;
             });
         }else{
-            NSAssert(NO, @"then can only handle block and promise");
+            NSAssert(NO, @"[then] can only handle block/invocation/promise");
             return nil;
         }
     };
 }
 
 - (AYPromise *(^)(id))catch{
-    return ^(id block){
-        NSAssert(isBlock(block), @"catch can only handle block.");
-        return __catch(self, dispatch_get_main_queue(), block);
+    return ^(id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[catch] can only handle block/invocation.");
+        return __catch(self, dispatch_get_main_queue(), value);
     };
 }
 @end
 
 @implementation AYPromise (Extension)
 - (AYPromise *(^)(id))thenAsync{
-    return ^(id block){
-        NSAssert(isBlock(block), @"thenAsync can only handle block.");
-        return __then(self, dispatch_get_global_queue(0, 0), block);
+    return ^(id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[thenAsync] can only handle block/invocation.");
+        return __then(self, dispatch_get_global_queue(0, 0), value);
     };
 }
 
 - (AYPromise *(^)(NSTimeInterval, id))thenDelay{
-    return ^(NSTimeInterval delaySecond, id block){
-        NSAssert(isBlock(block), @"thenDelay can only handle block.");
+    return ^(NSTimeInterval delaySecond, id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[thenDelay] can only handle block/invocation.");
         return __pipe(self, ^(id result, PSResolve resolver) {
             if (isError(result)) {
                 resolver(result);
             }else{
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySecond * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        resolver(_call_block(block, result));
+                        resolver(__execute__(value, result));
                     });
                 });
             }
@@ -369,9 +390,9 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 }
 
 - (AYPromise *(^)(dispatch_queue_t, id))thenOn{
-    return ^(dispatch_queue_t queue, id block){
-        NSAssert(isBlock(block), @"thenOn can only handle block.");
-        return __then(self, queue, block);
+    return ^(dispatch_queue_t queue, id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[thenOn] can only handle block/invocation.");
+        return __then(self, queue, value);
     };
 }
 
@@ -395,26 +416,26 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 }
 
 - (AYPromise *(^)(id))catchAsync{
-    return ^(id block){
-        NSAssert(isBlock(block), @"catchAsync can only handle block.");
-        return __catch(self, dispatch_get_global_queue(0, 0), block);
+    return ^(id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[catchAsync] can only handle block/invocation.");
+        return __catch(self, dispatch_get_global_queue(0, 0), value);
     };
 }
 
 - (AYPromise *(^)(dispatch_queue_t, id))catchOn{
-    return ^(dispatch_queue_t queue, id block){
-        NSAssert(isBlock(block), @"catchOn can only handle block.");
-        return __catch(self, queue, block);
+    return ^(dispatch_queue_t queue, id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[catchOn] can only handle block/invocation.");
+        return __catch(self, queue, value);
     };
 }
 
 - (AYPromise *(^)(id))always{
-    return ^(id block){
-        NSAssert(isBlock(block), @"always can only handle block.");
+    return ^(id value){
+        NSAssert(isBlock(value) || isInvocation(value), @"[always] can only handle block/invocation.");
         return __pipe(self, ^(id result, PSResolve resolver) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 @try {
-                    resolver(_call_block(block, result));
+                    resolver(__execute__(value, result));
                 }
                 @catch (NSError *error) {
                     resolver(error);
@@ -426,7 +447,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 @end
 
 AYPromise *AYPromiseWith(id value){
-    if (isBlock(value)) {
+    if (isBlock(value) || isInvocation(value)) {
         return AYPromise.resolve(nil).then(value);
     }else if (isArray(value)){
         return AYPromise.all(value);
@@ -436,7 +457,7 @@ AYPromise *AYPromiseWith(id value){
 }
 
 AYPromise *AYPromiseAsyncWith(id value){
-    if (isBlock(value)) {
+    if (isBlock(value) || isInvocation(value)) {
         return AYPromise.resolve(nil).thenAsync(value);
     }else{
         return AYPromiseWith(value);

@@ -17,7 +17,9 @@ FOUNDATION_EXPORT NSString * const AYPromiseInternalErrorsKey;
  *  @param localizedDescription 错误描述
  *  @param internalErrors       内部错误，通过error.userInfo[AYPromiseInternalErrorsKey]可以获得
  */
-FOUNDATION_EXPORT NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
+NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
+
+NSInvocation *NSInvocationMake(id target, SEL action);
 
 typedef void (^PSResolve)(id __nullable result);
 
@@ -80,20 +82,20 @@ typedef NS_ENUM(NSUInteger, AYPromiseState) {
  *  如果catch的返回值不是promise，会作为下一个then的参数
  *  如果catch的返回值是一个新的promise对象，那么之后的then添加的操作函数会被托管给新的promise对象
  */
-- (AYPromise *(^)(id block))catch;
+- (AYPromise *(^)(id value))catch;
 @end
 
 /**
  *  标准接口之外添加的便利方法
  */
 @interface AYPromise (Extension)
-- (AYPromise *(^)(id block))thenAsync;/**< 异步执行 */
-- (AYPromise *(^)(NSTimeInterval delaySecond, id block))thenDelay;/**< 延迟执行 */
-- (AYPromise *(^)(dispatch_queue_t queue, id block))thenOn;/**< 在指定线程执行 */
+- (AYPromise *(^)(id value))thenAsync;/**< 异步执行 */
+- (AYPromise *(^)(NSTimeInterval delaySecond, id value))thenDelay;/**< 延迟执行 */
+- (AYPromise *(^)(dispatch_queue_t queue, id value))thenOn;/**< 在指定线程执行 */
 - (AYPromise *(^)(void (^resolver)(id result, PSResolve resolve)))thenPromise;/**< 需要回调的任务 */
-- (AYPromise *(^)(id block))catchAsync;/**< 异步处理错误 */
-- (AYPromise *(^)(dispatch_queue_t queue, id block))catchOn;/**< 在指定线程处理错误 */
-- (AYPromise *(^)(id block))always;/**< 无论错误还是正确都执行 */
+- (AYPromise *(^)(id value))catchAsync;/**< 异步处理错误 */
+- (AYPromise *(^)(dispatch_queue_t queue, id value))catchOn;/**< 在指定线程处理错误 */
+- (AYPromise *(^)(id value))always;/**< 无论错误还是正确都执行 */
 @end
 /**
  *  创建Promise对象
