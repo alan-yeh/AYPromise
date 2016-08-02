@@ -2,7 +2,7 @@
 //  PromiseTest.m
 //  AYPromise
 //
-//  Created by PoiSon on 16/7/22.
+//  Created by Alan Yeh on 16/7/22.
 //  Copyright © 2016年 Alan Yeh. All rights reserved.
 //
 
@@ -19,7 +19,7 @@
 
 - (void)testPromiseBlock{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"AsyncTask completed");
         });
@@ -35,7 +35,7 @@
 - (void)testPromiseError{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(NSErrorMake(nil, @"发生错误了"));
         });
@@ -66,13 +66,13 @@
 
 - (void)testThen2{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"AsyncTask completed");
         });
     }).then(^(NSString *result){
         XCTAssert([result isEqualToString:@"AsyncTask completed"]);
-        return AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+        return AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
             resolve([result stringByAppendingString:@"123"]);
         }).then(^{
             return @"123";
@@ -89,7 +89,7 @@
 
 - (void)testFinally1{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"AsyncTask completed");
         });
@@ -105,7 +105,7 @@
 
 - (void)testFinally2{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(NSErrorMake(nil, @"发生错误了"));
         });
@@ -121,13 +121,13 @@
 
 - (void)testFinally3{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"AsyncTask completed");
         });
     }).then(^(NSString *result){
         XCTAssert([result isEqualToString:@"AsyncTask completed"]);
-        return AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+        return AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
             resolve([result stringByAppendingString:@"123"]);
         }).then(^{
             return @"123";
@@ -142,10 +142,10 @@
 
 - (void)testPipe{
     id ex1 = [self expectationWithDescription:@"expectation"];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         resolve(@"123");
     }).then(^(NSString *result){
-        return AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+        return AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
             resolve([result stringByAppendingString:@"123"]);
         });
     }).then(^(NSString *result){
@@ -158,12 +158,12 @@
 - (void)testPromiseAll{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromise *p1 = AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromise *p1 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
         resolve(@"thread1");
     });
     
-    AYPromise *p2 = AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromise *p2 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
         resolve(@"thread2");
     });
@@ -180,12 +180,12 @@
 - (void)testPromiseRace{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromise *p1 = AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromise *p1 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
         resolve(@"thread1");
     });
     
-    AYPromise *p2 = AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromise *p2 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
         resolve(@"thread2");
     });
@@ -202,9 +202,9 @@
 - (void)testThenPromise{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         resolve(@"1");
-    }).thenPromise(^(NSString *result, PSResolve resolve){
+    }).thenPromise(^(NSString *result, AYResolve resolve){
         XCTAssert([result isEqualToString:@"1"]);
         resolve(@"2");
     }).then(^(NSString *result){
@@ -216,7 +216,7 @@
 
 - (void)testDelayThen{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         NSLog(@"reutrn: 123");
         resolve(@"123");
     }).thenDelay(0.2, ^(NSString *result){
@@ -229,7 +229,7 @@
 
 - (void)testDelay{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             resolve(NSErrorMake(nil, @"发生错误了"));
         });

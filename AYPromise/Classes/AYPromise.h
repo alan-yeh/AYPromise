@@ -2,8 +2,8 @@
 //  AYPromise.h
 //  AYPromise
 //
-//  Created by PoiSon on 16/2/15.
-//  Copyright © 2016年 PoiSon. All rights reserved.
+//  Created by Alan Yeh on 16/2/15.
+//  Copyright © 2016年 Alan Yeh. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -21,7 +21,7 @@ NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription
 
 NSInvocation *NSInvocationMake(id target, SEL action);
 
-typedef void (^PSResolve)(id __nullable result);
+typedef void (^AYResolve)(id __nullable result);
 
 typedef NS_ENUM(NSUInteger, AYPromiseState) {
     AYPromiseStatePending = 1 << 0, /**< 待执行状态 */
@@ -72,6 +72,7 @@ typedef NS_ENUM(NSUInteger, AYPromiseState) {
  *  如果then的返回值不是Promise，会作为下一个then的参数
  *  如果then的返回值是Promise对象，那么之后的then添加的操作函数会被托管给返回的Promise对象
  *  如果value是一个Promise,则认为then的返回值是Promise对象
+ *  如果value是一个NSInvocation对象,则将上一个Promise的结果作为参数调用NSInvocation
  */
 - (AYPromise *(^)(id value))then;
 
@@ -92,7 +93,7 @@ typedef NS_ENUM(NSUInteger, AYPromiseState) {
 - (AYPromise *(^)(id value))thenAsync;/**< 异步执行 */
 - (AYPromise *(^)(NSTimeInterval delaySecond, id value))thenDelay;/**< 延迟执行 */
 - (AYPromise *(^)(dispatch_queue_t queue, id value))thenOn;/**< 在指定线程执行 */
-- (AYPromise *(^)(void (^resolver)(id result, PSResolve resolve)))thenPromise;/**< 需要回调的任务 */
+- (AYPromise *(^)(void (^resolver)(id result, AYResolve resolve)))thenPromise;/**< 需要回调的任务 */
 - (AYPromise *(^)(id value))catchAsync;/**< 异步处理错误 */
 - (AYPromise *(^)(dispatch_queue_t queue, id value))catchOn;/**< 在指定线程处理错误 */
 - (AYPromise *(^)(id value))always;/**< 无论错误还是正确都执行 */
@@ -101,6 +102,7 @@ typedef NS_ENUM(NSUInteger, AYPromiseState) {
  *  创建Promise对象
  *
  *  如果value是block，则创建一个Pending状态的Promise并同步执行block
+ *  如果value是NSInvocation对象，则创建一个Pending状态的Promise并同步执行NSInvocation
  *  如果value是Promise, 则直接返回Promise
  *  如果vlaue是数组，则返回Promise.all封装的Promise
  *  如果vlaue是NSError对象，则返回一个Rejected状态的Promise
@@ -117,7 +119,7 @@ FOUNDATION_EXPORT AYPromise *AYPromiseAsyncWith(_Nullable id value);
 /**
  *  创建一个需要回调的Promise
  */
-FOUNDATION_EXPORT AYPromise *AYPromiseWithResolve(void (^)(PSResolve resolve));
+FOUNDATION_EXPORT AYPromise *AYPromiseWithResolve(void (^)(AYResolve resolve));
 NS_ASSUME_NONNULL_END
 
 

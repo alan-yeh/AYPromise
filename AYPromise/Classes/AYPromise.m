@@ -2,12 +2,13 @@
 //  AYPromise.m
 //  AYPromise
 //
-//  Created by PoiSon on 16/2/21.
-//  Copyright © 2016年 PoiSon. All rights reserved.
+//  Created by Alan Yeh on 16/2/21.
+//  Copyright © 2016年 Alan Yeh. All rights reserved.
 //
 
 #import "AYPromise.h"
 #import <libkern/OSAtomic.h>
+#import <AYRuntime/AYBlockInvocation.h>
 
 #define isError(obj) [obj isKindOfClass:[NSError class]]
 #define isPromise(obj) [obj isKindOfClass:[AYPromise class]]
@@ -45,73 +46,22 @@ NSInvocation *NSInvocationMake(id target, SEL action){
     return invocation;
 }
 
-/**
- *  @see CTObjectiveCRuntimeAdditions https://github.com/ebf/CTObjectiveCRuntimeAdditions
- */
-struct PSBlockLiteral {
-    void *isa; // initialized to &_NSConcreteStackBlock or &_NSConcreteGlobalBlock
-    int flags;
-    int reserved;
-    void (*invoke)(void *, ...);
-    struct ps_block_descriptor {
-        unsigned long int reserved;	// NULL
-        unsigned long int size;         // sizeof(struct Block_literal_1)
-        // optional helper functions
-        void (*copy_helper)(void *dst, void *src);     // IFF (1<<25)
-        void (*dispose_helper)(void *src);             // IFF (1<<25)
-        // required ABI.2010.3.16
-        const char *signature;                         // IFF (1<<30)
-    } *descriptor;
-    // imported variables
-};
-
-typedef NS_ENUM(NSUInteger, PSBlockDescriptionFlags) {
-    PSBlockDescriptionFlagsHasCopyDispose = (1 << 25),
-    PSBlockDescriptionFlagsHasCtor = (1 << 26), // helpers have C++ code
-    PSBlockDescriptionFlagsIsGlobal = (1 << 28),
-    PSBlockDescriptionFlagsHasStret = (1 << 29), // IFF BLOCK_HAS_SIGNATURE
-    PSBlockDescriptionFlagsHasSignature = (1 << 30)
-};
-
-static NSMethodSignature *_signatureForBlock(id block) {
-    if (!block)
-        return nil;
-    
-    struct PSBlockLiteral *blockRef = (__bridge struct PSBlockLiteral *)block;
-    PSBlockDescriptionFlags flags = (PSBlockDescriptionFlags)blockRef->flags;
-    
-    if (flags & PSBlockDescriptionFlagsHasSignature) {
-        void *signatureLocation = blockRef->descriptor;
-        signatureLocation += sizeof(unsigned long int);
-        signatureLocation += sizeof(unsigned long int);
-        
-        if (flags & PSBlockDescriptionFlagsHasCopyDispose) {
-            signatureLocation += sizeof(void (*)(void *dst, void *src));
-            signatureLocation += sizeof(void (*)(void *src));
-        }
-        
-        const char *signature = (*(const char **)signatureLocation);
-        return [NSMethodSignature signatureWithObjCTypes:signature];
-    }
-    return nil;
-}
-
 static id __execute__(id target, id args){
     NSCParameterAssert(isBlock(target) || isInvocation(target));
     
     NSMethodSignature *signature;
-    NSInvocation *invocation;
+    id invocation;
     
     if (isBlock(target)) {
-        signature = _signatureForBlock(target);
-        invocation = [NSInvocation invocationWithMethodSignature:signature];
-        [invocation setTarget:target];
+        invocation = [AYBlockInvocation invocationWithBlock:target];
+        signature = [invocation blockSignature].signature;
         if (args && signature.numberOfArguments > 1) {
             [invocation setArgument:&args atIndex:1];
         }
     }else{
-        signature = [target methodSignature];
+        //target is NSInvocation object
         invocation = target;
+        signature = [target methodSignature];
         if (args && signature.numberOfArguments > 2) {
             [invocation setArgument:&args atIndex:2];
         }
@@ -136,7 +86,7 @@ static id __execute__(id target, id args){
 @interface AYPromise()
 @property (nonatomic) dispatch_queue_t barrier;
 @property (nonatomic, strong) id value;
-@property (nonatomic, strong) NSMutableArray<PSResolve> *handlers;
+@property (nonatomic, strong) NSMutableArray<AYResolve> *handlers;
 @end
 
 @implementation AYPromise
@@ -151,11 +101,11 @@ static id __execute__(id target, id args){
 /**
  *  创建一个未执行的Promise
  */
-- (instancetype)initWithResolver:(void (^)(PSResolve))resolver{
+- (instancetype)initWithResolver:(void (^)(AYResolve))resolver{
     if (self = [super init]) {
         _state = AYPromiseStatePending;
         
-        PSResolve __presolve = ^(id result){
+        AYResolve __presolve = ^(id result){
             __block NSMutableArray *handlers;
             //保证执行链的顺序执行
             dispatch_barrier_sync(self.barrier, ^{
@@ -171,12 +121,12 @@ static id __execute__(id target, id args){
                     self.value = result;
                 }
             });
-            for (PSResolve handler in handlers) {
+            for (AYResolve handler in handlers) {
                 handler(result);
             }
         };
         
-        PSResolve __resolve = ^(id result){
+        AYResolve __resolve = ^(id result){
             if (self.state & AYPromiseStatePending) {
                 if (isPromise(result)) {
                     [result pipe:__presolve];
@@ -224,7 +174,7 @@ static id __execute__(id target, id args){
  *  如果当前Promise还没有被执行，则接接在当前Promise的执行栈中
  *  如果当前Promise已经执行了，则直接将当前Promise的值传给下一个执行者
  */
-- (void)pipe:(PSResolve)resolve{
+- (void)pipe:(AYResolve)resolve{
     if (self.state == AYPromiseStatePending) {
         [self.handlers addObject:resolve];
     }else{
@@ -236,8 +186,8 @@ static id __execute__(id target, id args){
  *  创建一个Promise,并拼接在Promise(self)的执行链中
  *
  */
-static inline AYPromise *__pipe(AYPromise *self, void(^then)(id, PSResolve)){
-    return [[AYPromise alloc] initWithResolver:^(PSResolve resolver) {
+static inline AYPromise *__pipe(AYPromise *self, void(^then)(id, AYResolve)){
+    return [[AYPromise alloc] initWithResolver:^(AYResolve resolver) {
         [self pipe:^(id result) {
             then(result, resolver);//handle resule of previous promise
         }];
@@ -248,7 +198,7 @@ static inline AYPromise *__pipe(AYPromise *self, void(^then)(id, PSResolve)){
  *  将Promise拼接在self之后,仅处理正确的逻辑
  */
 static inline AYPromise *__then(AYPromise *self, dispatch_queue_t queue, id block){
-    return __pipe(self, ^(id result, PSResolve resolver) {
+    return __pipe(self, ^(id result, AYResolve resolver) {
         if (isError(result)) {
             resolver(result);
         }else{
@@ -262,7 +212,7 @@ static inline AYPromise *__then(AYPromise *self, dispatch_queue_t queue, id bloc
  *  将Promise接接在self之后,仅处理错误的逻辑
  */
 static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id block){
-    return __pipe(self, ^(id result, PSResolve resolver) {
+    return __pipe(self, ^(id result, AYResolve resolver) {
         if (isError(result)) {
             dispatch_async(queue, ^{
                 resolver(__execute__(block, result));
@@ -284,7 +234,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 
 + (AYPromise *(^)(NSArray<AYPromise *> *))all{
     return ^(NSArray<AYPromise *> *promises){
-        return [[AYPromise alloc] initWithResolver:^(PSResolve resolve) {
+        return [[AYPromise alloc] initWithResolver:^(AYResolve resolve) {
             NSAssert(isArray(promises), @"all can only hand array");
             
             __block int64_t totalCount = [promises count];
@@ -316,7 +266,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
     return ^(NSArray<AYPromise *> *promises){
         NSAssert(isArray(promises), @"race can only hand array");
         
-        return [[AYPromise alloc] initWithResolver:^(PSResolve resolve) {
+        return [[AYPromise alloc] initWithResolver:^(AYResolve resolve) {
             __block int64_t totalCount = [promises count];
             for (__strong id promise in promises) {
                 if (!isPromise(promise)) {
@@ -375,7 +325,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 - (AYPromise *(^)(NSTimeInterval, id))thenDelay{
     return ^(NSTimeInterval delaySecond, id value){
         NSAssert(isBlock(value) || isInvocation(value), @"[thenDelay] can only handle block/invocation.");
-        return __pipe(self, ^(id result, PSResolve resolver) {
+        return __pipe(self, ^(id result, AYResolve resolver) {
             if (isError(result)) {
                 resolver(result);
             }else{
@@ -396,9 +346,9 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
     };
 }
 
-- (AYPromise * (^)(void (^)(id, PSResolve)))thenPromise{
-    return ^(void (^resolver)(id, PSResolve)){
-        return __pipe(self, ^(id result, PSResolve resolve) {
+- (AYPromise * (^)(void (^)(id, AYResolve)))thenPromise{
+    return ^(void (^resolver)(id, AYResolve)){
+        return __pipe(self, ^(id result, AYResolve resolve) {
             if (!isError(result)) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     @try {
@@ -432,7 +382,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 - (AYPromise *(^)(id))always{
     return ^(id value){
         NSAssert(isBlock(value) || isInvocation(value), @"[always] can only handle block/invocation.");
-        return __pipe(self, ^(id result, PSResolve resolver) {
+        return __pipe(self, ^(id result, AYResolve resolver) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 @try {
                     resolver(__execute__(value, result));
@@ -464,7 +414,7 @@ AYPromise *AYPromiseAsyncWith(id value){
     }
 }
 
-AYPromise *AYPromiseWithResolve(void (^resolver)(PSResolve)){
+AYPromise *AYPromiseWithResolve(void (^resolver)(AYResolve)){
     return [[AYPromise alloc] initWithResolver:resolver];
 }
 

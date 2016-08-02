@@ -2,7 +2,7 @@
 //  ThreadTest.m
 //  AYPromise
 //
-//  Created by PoiSon on 16/7/22.
+//  Created by Alan Yeh on 16/7/22.
 //  Copyright © 2016年 Alan Yeh. All rights reserved.
 //
 
@@ -19,7 +19,7 @@
 
 - (void)test1{
     id ex1 = [self expectationWithDescription:@""];
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
         [ex1 fulfill];
     });
@@ -29,7 +29,7 @@
 - (void)test2{
     id ex1 = [self expectationWithDescription:@""];
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+        AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
             XCTAssertEqual([NSThread currentThread].isMainThread, YES);
             [ex1 fulfill];
         });
@@ -40,7 +40,7 @@
 - (void)test3{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         resolve(@"abc");
     }).then(^(NSString *result){
         XCTAssertEqual([NSThread currentThread].isMainThread, YES);
@@ -53,7 +53,7 @@
     id ex1 = [self expectationWithDescription:@""];
     
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+        AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
             resolve(@"abc");
         }).then(^(NSString *result){
             XCTAssertEqual([NSThread currentThread].isMainThread, YES);
@@ -66,7 +66,7 @@
 - (void)test5{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"success");
         });
@@ -81,7 +81,7 @@
 - (void)test6{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(NSErrorMake(nil, @"发生错误了"));
         });
@@ -95,7 +95,7 @@
 - (void)test7{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(NSErrorMake(nil, @"发生错误了"));
         });
@@ -109,7 +109,7 @@
 - (void)test8{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"success");
         });
@@ -124,7 +124,7 @@
 - (void)test9{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"success");
         });
@@ -141,7 +141,7 @@
     
     dispatch_queue_t queue = dispatch_queue_create("dispatch_test", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             resolve(@"success");
         });
@@ -159,7 +159,7 @@
     
     dispatch_queue_t queue = dispatch_queue_create("dispatch_test", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         @throw NSErrorMake(nil, @"Error");
     }).catchOn(queue, ^{
         dispatch_queue_t current_queuet = dispatch_get_current_queue();
@@ -173,7 +173,7 @@
 - (void)test12{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromiseWithResolve(^(PSResolve  _Nonnull resolve) {
+    AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
         @throw NSErrorMake(nil, @"Error");
     }).catchAsync(^{
         XCTAssertEqual([NSThread currentThread].isMainThread, NO);

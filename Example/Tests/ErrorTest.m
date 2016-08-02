@@ -2,7 +2,7 @@
 //  ErrorTest.m
 //  AYPromise
 //
-//  Created by PoiSon on 16/7/22.
+//  Created by Alan Yeh on 16/7/22.
 //  Copyright © 2016年 Alan Yeh. All rights reserved.
 //
 
@@ -60,7 +60,7 @@
     
     AYPromiseWith(^{
         return @"aaa";
-    }).thenPromise(^(id result, PSResolve resolve){
+    }).thenPromise(^(id result, AYResolve resolve){
         @throw NSErrorMake(nil, @"Error");
     }).then(^{
         XCTAssert(NO, @"这里不应该执行");

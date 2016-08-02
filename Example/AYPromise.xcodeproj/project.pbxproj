@@ -11,6 +11,7 @@
 		1D37FD491D42044700A690FD /* ErrorTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD481D42044700A690FD /* ErrorTest.m */; };
 		1D37FD4B1D42048800A690FD /* PromiseTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD4A1D42048800A690FD /* PromiseTest.m */; };
 		1D37FD4D1D4204B400A690FD /* ThreadTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD4C1D4204B400A690FD /* ThreadTest.m */; };
+		5D4500A51D50BDEC005D1483 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D4500A41D50BDEC005D1483 /* Launch Screen.storyboard */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -41,6 +42,7 @@
 		1D37FD481D42044700A690FD /* ErrorTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorTest.m; sourceTree = "<group>"; };
 		1D37FD4A1D42048800A690FD /* PromiseTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromiseTest.m; sourceTree = "<group>"; };
 		1D37FD4C1D4204B400A690FD /* ThreadTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadTest.m; sourceTree = "<group>"; };
+		5D4500A41D50BDEC005D1483 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* AYPromise_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AYPromise_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -136,10 +138,11 @@
 			children = (
 				6003F59C195388D20070C39A /* AYAppDelegate.h */,
 				6003F59D195388D20070C39A /* AYAppDelegate.m */,
-				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* AYViewController.h */,
 				6003F5A6195388D20070C39A /* AYViewController.m */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
+				5D4500A41D50BDEC005D1483 /* Launch Screen.storyboard */,
+				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F594195388D20070C39A /* Supporting Files */,
 			);
 			name = "Example for AYPromise";
@@ -290,6 +293,7 @@
 			files = (
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
+				5D4500A51D50BDEC005D1483 /* Launch Screen.storyboard in Resources */,
 				6003F598195388D20070C39A /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

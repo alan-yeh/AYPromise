@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AYPromise'
-  s.version          = '1.1.0'
+  s.version          = '1.1.1'
   s.summary          = 'Promise for objective-c.'
 
   s.homepage         = 'https://github.com/alan-yeh/AYPromise'
@@ -19,4 +19,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '6.0'
 
   s.source_files = 'AYPromise/Classes/**/*'
+  s.dependency 'AYRuntime'
 end

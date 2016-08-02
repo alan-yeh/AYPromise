@@ -1,5 +1,7 @@
 PODS:
-  - AYPromise (1.1.0)
+  - AYPromise (1.1.0):
+    - AYRuntime
+  - AYRuntime (1.0.1)
 
 DEPENDENCIES:
   - AYPromise (from `../`)
@@ -9,7 +11,8 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  AYPromise: f9f4f2615f3a7b855584e3be8fef537982753308
+  AYPromise: 530ee61c6cb1219bd62823b1b9cdffa53b4e0a53
+  AYRuntime: c738c601ee1cc553601def6dda83e640ea0fd465
 
 PODFILE CHECKSUM: 6e0270353a9b3f48982dd61cbbf7e0e7648b456a
 
