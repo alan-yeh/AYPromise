@@ -182,4 +182,29 @@
     
     [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
 }
+
+- (void)test13{
+    id ex1 = [self expectationWithDescription:@""];
+    AYPromiseAsyncWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, NO);
+        resolve(nil);
+    }).always(^{
+        [ex1 fulfill];
+    });
+    [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
+}
+
+- (void)test14{
+    id ex1 = [self expectationWithDescription:@""];
+    AYPromiseWith(^{
+        XCTAssertEqual([NSThread currentThread].isMainThread, YES);
+    }).thenAsyncPromise(^(id arg, AYResolve resolve){
+        XCTAssertEqual([NSThread currentThread].isMainThread, NO);
+        resolve(nil);
+    }).always(^{
+        [ex1 fulfill];
+    });
+    [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
+}
+
 @end

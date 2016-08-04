@@ -94,6 +94,7 @@ typedef NS_ENUM(NSUInteger, AYPromiseState) {
 - (AYPromise *(^)(NSTimeInterval delaySecond, id value))thenDelay;/**< 延迟执行 */
 - (AYPromise *(^)(dispatch_queue_t queue, id value))thenOn;/**< 在指定线程执行 */
 - (AYPromise *(^)(void (^resolver)(id result, AYResolve resolve)))thenPromise;/**< 需要回调的任务 */
+- (AYPromise *(^)(void (^resolver)(id result, AYResolve resolve)))thenAsyncPromise;/**< 异步执行需要回调的任务 */
 - (AYPromise *(^)(id value))catchAsync;/**< 异步处理错误 */
 - (AYPromise *(^)(dispatch_queue_t queue, id value))catchOn;/**< 在指定线程处理错误 */
 - (AYPromise *(^)(id value))always;/**< 无论错误还是正确都执行 */
@@ -120,6 +121,10 @@ FOUNDATION_EXPORT AYPromise *AYPromiseAsyncWith(_Nullable id value);
  *  创建一个需要回调的Promise
  */
 FOUNDATION_EXPORT AYPromise *AYPromiseWithResolve(void (^)(AYResolve resolve));
+/**
+ *  创建一个异步执行，需要回调的Promise
+ */
+FOUNDATION_EXPORT AYPromise *AYPromiseAsyncWithResolve(void (^)(AYResolve resolve));
 NS_ASSUME_NONNULL_END
 
 

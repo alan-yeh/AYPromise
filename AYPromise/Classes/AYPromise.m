@@ -101,7 +101,7 @@ static id __execute__(id target, id args){
 /**
  *  创建一个未执行的Promise
  */
-- (instancetype)initWithResolver:(void (^)(AYResolve))resolver{
+- (instancetype)initWithResolver:(void (^)(AYResolve))resolver andExecuteQueue:(dispatch_queue_t)queue{
     if (self = [super init]) {
         _state = AYPromiseStatePending;
         
@@ -136,7 +136,7 @@ static id __execute__(id target, id args){
             }
         };
         //创建好之后，直接开始执行任务
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(queue, ^{
             @try {
                 resolver(__resolve);
             }
@@ -146,6 +146,10 @@ static id __execute__(id target, id args){
         });
     }
     return self;
+}
+
+- (instancetype)initWithResolver:(void (^)(AYResolve))resolver{
+    return [self initWithResolver:resolver andExecuteQueue:dispatch_get_main_queue()];
 }
 
 /**
@@ -365,6 +369,25 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
     };
 }
 
+- (AYPromise * (^)(void (^)(id, AYResolve)))thenAsyncPromise{
+    return ^(void (^resolver)(id, AYResolve)){
+        return __pipe(self, ^(id result, AYResolve resolve) {
+            if (!isError(result)) {
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    @try {
+                        resolver(result, resolve);
+                    }
+                    @catch (NSError *error) {
+                        resolve(error);
+                    }
+                });
+            }else{
+                resolve(result);
+            }
+        });
+    };
+}
+
 - (AYPromise *(^)(id))catchAsync{
     return ^(id value){
         NSAssert(isBlock(value) || isInvocation(value), @"[catchAsync] can only handle block/invocation.");
@@ -418,3 +441,6 @@ AYPromise *AYPromiseWithResolve(void (^resolver)(AYResolve)){
     return [[AYPromise alloc] initWithResolver:resolver];
 }
 
+AYPromise *AYPromiseAsyncWithResolve(void (^resolver)(AYResolve)){
+    return [[AYPromise alloc] initWithResolver:resolver andExecuteQueue:dispatch_get_global_queue(0, 0)];
+}
