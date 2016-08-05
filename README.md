@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/cocoapods/l/AYPromise.svg?style=flat)](http://cocoapods.org/pods/AYPromise)
 [![Platform](https://img.shields.io/cocoapods/p/AYPromise.svg?style=flat)](http://cocoapods.org/pods/AYPromise)
 
-## 获取Promise
-　　使用[CocoaPods](http://cocoapods.org)可以很方便地引入Promise。Podfile添加AYPromise的依赖。
+## 引用
+　　使用[CocoaPods](http://cocoapods.org)可以很方便地引入AYPromise。Podfile添加AYPromise的依赖。
 
 ```ruby
 pod "AYPromise"
