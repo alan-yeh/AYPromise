@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		0F86ABB9D89AAE464DF7A7E0 /* Pods_AYPromise_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E7D6369F3C3E8D0E5CC5566 /* Pods_AYPromise_Tests.framework */; };
+		1D08248D1D5ABCBE0045600D /* LoginApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D08248C1D5ABCBE0045600D /* LoginApi.m */; };
+		1D0824901D5AC6950045600D /* ContactApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D08248F1D5AC6950045600D /* ContactApi.m */; };
+		1D0824931D5AC7000045600D /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D0824921D5AC7000045600D /* Contact.m */; };
+		1D0824961D5AD57D0045600D /* HttpApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D0824951D5AD57D0045600D /* HttpApi.m */; };
+		1D0824991D5AF0CE0045600D /* Api.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D0824981D5AF0CE0045600D /* Api.m */; };
 		1D37FD491D42044700A690FD /* ErrorTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD481D42044700A690FD /* ErrorTest.m */; };
 		1D37FD4B1D42048800A690FD /* PromiseTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD4A1D42048800A690FD /* PromiseTest.m */; };
 		1D37FD4D1D4204B400A690FD /* ThreadTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D37FD4C1D4204B400A690FD /* ThreadTest.m */; };
@@ -39,6 +44,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1D08248B1D5ABCBE0045600D /* LoginApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginApi.h; path = Apis/LoginApi.h; sourceTree = "<group>"; };
+		1D08248C1D5ABCBE0045600D /* LoginApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginApi.m; path = Apis/LoginApi.m; sourceTree = "<group>"; };
+		1D08248E1D5AC6950045600D /* ContactApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ContactApi.h; path = Apis/ContactApi.h; sourceTree = "<group>"; };
+		1D08248F1D5AC6950045600D /* ContactApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ContactApi.m; path = Apis/ContactApi.m; sourceTree = "<group>"; };
+		1D0824911D5AC7000045600D /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Contact.h; path = Models/Contact.h; sourceTree = "<group>"; };
+		1D0824921D5AC7000045600D /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Contact.m; path = Models/Contact.m; sourceTree = "<group>"; };
+		1D0824941D5AD57D0045600D /* HttpApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HttpApi.h; path = Apis/HttpApi.h; sourceTree = "<group>"; };
+		1D0824951D5AD57D0045600D /* HttpApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HttpApi.m; path = Apis/HttpApi.m; sourceTree = "<group>"; };
+		1D0824971D5AF0CE0045600D /* Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Api.h; path = Apis/Api.h; sourceTree = "<group>"; };
+		1D0824981D5AF0CE0045600D /* Api.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Api.m; path = Apis/Api.m; sourceTree = "<group>"; };
 		1D37FD481D42044700A690FD /* ErrorTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorTest.m; sourceTree = "<group>"; };
 		1D37FD4A1D42048800A690FD /* PromiseTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromiseTest.m; sourceTree = "<group>"; };
 		1D37FD4C1D4204B400A690FD /* ThreadTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadTest.m; sourceTree = "<group>"; };
@@ -99,6 +114,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5D48952E1D59F916007F446E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1D0824911D5AC7000045600D /* Contact.h */,
+				1D0824921D5AC7000045600D /* Contact.m */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		5D4895351D59F968007F446E /* Apis */ = {
+			isa = PBXGroup;
+			children = (
+				1D08248B1D5ABCBE0045600D /* LoginApi.h */,
+				1D08248C1D5ABCBE0045600D /* LoginApi.m */,
+				1D08248E1D5AC6950045600D /* ContactApi.h */,
+				1D08248F1D5AC6950045600D /* ContactApi.m */,
+				1D0824941D5AD57D0045600D /* HttpApi.h */,
+				1D0824951D5AD57D0045600D /* HttpApi.m */,
+				1D0824971D5AF0CE0045600D /* Api.h */,
+				1D0824981D5AF0CE0045600D /* Api.m */,
+			);
+			name = Apis;
+			sourceTree = "<group>";
+		};
 		6003F581195388D10070C39A = {
 			isa = PBXGroup;
 			children = (
@@ -136,6 +175,8 @@
 		6003F593195388D20070C39A /* Example for AYPromise */ = {
 			isa = PBXGroup;
 			children = (
+				5D4895351D59F968007F446E /* Apis */,
+				5D48952E1D59F916007F446E /* Models */,
 				6003F59C195388D20070C39A /* AYAppDelegate.h */,
 				6003F59D195388D20070C39A /* AYAppDelegate.m */,
 				6003F5A5195388D20070C39A /* AYViewController.h */,
@@ -209,6 +250,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5BF195388D20070C39A /* Build configuration list for PBXNativeTarget "AYPromise_Example" */;
 			buildPhases = (
+				2A4D4609D5330C86FB8C92F8 /* [CP] Check Pods Manifest.lock */,
 				D0BF0870D18C56D4616FD914 /* [CP] Check Pods Manifest.lock */,
 				9D5360476AEE413E105BB188 /* [CP] Check Pods Manifest.lock */,
 				6003F586195388D20070C39A /* Sources */,
@@ -232,6 +274,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "AYPromise_Tests" */;
 			buildPhases = (
+				79CFEF5F51EE9456BAB861CF /* [CP] Check Pods Manifest.lock */,
 				A28A20F7BFBBFE2AFE679088 /* [CP] Check Pods Manifest.lock */,
 				EFA78DA3FA0AA846AE8FE514 /* [CP] Check Pods Manifest.lock */,
 				6003F5AA195388D20070C39A /* Sources */,
@@ -354,6 +397,21 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AYPromise_Tests/Pods-AYPromise_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		2A4D4609D5330C86FB8C92F8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		4C992660F78B36FC72A8AEB0 /* 📦 Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,6 +455,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AYPromise_Tests/Pods-AYPromise_Tests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		79CFEF5F51EE9456BAB861CF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		888AA59F9A4C6EBD8A2A9C0A /* [CP] Embed Pods Frameworks */ = {
@@ -496,8 +569,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D0824901D5AC6950045600D /* ContactApi.m in Sources */,
+				1D0824961D5AD57D0045600D /* HttpApi.m in Sources */,
+				1D0824991D5AF0CE0045600D /* Api.m in Sources */,
 				6003F59E195388D20070C39A /* AYAppDelegate.m in Sources */,
+				1D08248D1D5ABCBE0045600D /* LoginApi.m in Sources */,
 				6003F5A7195388D20070C39A /* AYViewController.m in Sources */,
+				1D0824931D5AC7000045600D /* Contact.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

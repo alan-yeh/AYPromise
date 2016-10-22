@@ -1,19 +1,39 @@
 PODS:
+  - AFNetworking (3.1.0):
+    - AFNetworking/NSURLSession (= 3.1.0)
+    - AFNetworking/Reachability (= 3.1.0)
+    - AFNetworking/Security (= 3.1.0)
+    - AFNetworking/Serialization (= 3.1.0)
+    - AFNetworking/UIKit (= 3.1.0)
+  - AFNetworking/NSURLSession (3.1.0):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.1.0)
+  - AFNetworking/Security (3.1.0)
+  - AFNetworking/Serialization (3.1.0)
+  - AFNetworking/UIKit (3.1.0):
+    - AFNetworking/NSURLSession
   - AYPromise (1.1.2):
     - AYRuntime
   - AYRuntime (1.0.2)
+  - SVProgressHUD (2.0.3)
 
 DEPENDENCIES:
+  - AFNetworking
   - AYPromise (from `../`)
+  - SVProgressHUD
 
 EXTERNAL SOURCES:
   AYPromise:
     :path: ../
 
 SPEC CHECKSUMS:
+  AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
   AYPromise: f0d8241aa96470a28bc5a8cde69702fad26cced7
   AYRuntime: a1d344a10f06897a4c5b7c1573d4071e72d36089
+  SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
 
-PODFILE CHECKSUM: 6e0270353a9b3f48982dd61cbbf7e0e7648b456a
+PODFILE CHECKSUM: bb26d296c269c33d333ede3312c1fe52dcdc0f16
 
 COCOAPODS: 1.1.0.beta.1

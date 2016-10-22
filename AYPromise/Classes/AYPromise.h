@@ -18,6 +18,7 @@ FOUNDATION_EXPORT NSString * const AYPromiseInternalErrorsKey;
  *  @param internalErrors       内部错误，通过error.userInfo[AYPromiseInternalErrorsKey]可以获得
  */
 NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
+NSError *NSErrorWithUserInfo(NSDictionary *userInfo, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
 
 NSInvocation *NSInvocationMake(id target, SEL action);
 

@@ -37,6 +37,25 @@ NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription
                                                                  }];
 }
 
+NSError *NSErrorWithUserInfo(NSDictionary *userInfo, NSString *localizedDescription, ...){
+    static NSString *domain = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        domain = [NSBundle mainBundle].infoDictionary[@"CFBundleName"];
+        domain = domain ?: @"none domain";
+    });
+    
+    va_list desc_args;
+    va_start(desc_args, localizedDescription);
+    NSString *desc = [[NSString alloc] initWithFormat:localizedDescription arguments:desc_args];
+    va_end(desc_args);
+    
+    NSMutableDictionary *userinfo = userInfo.mutableCopy;
+    userinfo[NSLocalizedDescriptionKey] = desc;
+    
+    return [NSError errorWithDomain:domain code:-1000 userInfo:userinfo];
+}
+
 NSInvocation *NSInvocationMake(id target, SEL action){
     NSCParameterAssert([target respondsToSelector:action]);
     

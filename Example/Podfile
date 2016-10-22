@@ -3,9 +3,11 @@ use_frameworks!
 target 'AYPromise_Example' do
   pod 'AYPromise', :path => '../'
 
+  pod 'AFNetworking'
+  pod 'SVProgressHUD'
+  
   target 'AYPromise_Tests' do
     inherit! :search_paths
 
-    
   end
 end
