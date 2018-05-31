@@ -106,6 +106,7 @@ static id __execute__(id target, id args){
 @property (nonatomic) dispatch_queue_t barrier;
 @property (nonatomic, strong) id value;
 @property (nonatomic, strong) NSMutableArray<AYResolve> *handlers;
+@property (nonatomic, assign) AYPromiseState state;
 @end
 
 @implementation AYPromise
@@ -122,7 +123,7 @@ static id __execute__(id target, id args){
  */
 - (instancetype)initWithResolver:(void (^)(AYResolve))resolver andExecuteQueue:(dispatch_queue_t)queue{
     if (self = [super init]) {
-        _state = AYPromiseStatePending;
+        self.state = AYPromiseStatePending;
         
         AYResolve __presolve = ^(id result){
             __block NSMutableArray *handlers;
@@ -133,9 +134,9 @@ static id __execute__(id target, id args){
                     handlers = self.handlers;
                     
                     if (isError(result)) {
-                        _state = AYPromiseStateRejected;
+                        self.state = AYPromiseStateRejected;
                     }else{
-                        _state = AYPromiseStateFulfilled;
+                        self.state = AYPromiseStateFulfilled;
                     }
                     self.value = result;
                 }
