@@ -442,7 +442,7 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
 AYPromise *AYPromiseWith(id value){
     if (isBlock(value) || isInvocation(value)) {
         return AYPromise.resolve(nil).then(value);
-    }else if (isArray(value)){
+    }else if (isArray(value) && [value count] > 0){
         return AYPromise.all(value);
     }else {
         return [[AYPromise alloc] initWithValue:value];
