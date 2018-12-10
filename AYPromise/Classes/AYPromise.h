@@ -17,10 +17,10 @@ FOUNDATION_EXPORT NSString * const AYPromiseInternalErrorsKey;
  *  @param localizedDescription 错误描述
  *  @param internalErrors       内部错误，通过error.userInfo[AYPromiseInternalErrorsKey]可以获得
  */
-NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
-NSError *NSErrorWithUserInfo(NSDictionary *userInfo, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
+FOUNDATION_EXPORT NSError *NSErrorMake(id _Nullable internalErrors, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
+FOUNDATION_EXPORT NSError *NSErrorWithUserInfo(NSDictionary *userInfo, NSString *localizedDescription, ...) NS_FORMAT_FUNCTION(2,3);
 
-NSInvocation *NSInvocationMake(id target, SEL action);
+FOUNDATION_EXPORT NSInvocation *NSInvocationMake(id target, SEL action);
 
 typedef void (^AYResolve)(id __nullable result);
 

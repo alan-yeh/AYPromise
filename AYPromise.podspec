@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AYPromise'
-  s.version          = '1.1.5'
+  s.version          = '1.1.6'
   s.summary          = 'Promise for objective-c.'
 
   s.homepage         = 'https://github.com/alan-yeh/AYPromise'

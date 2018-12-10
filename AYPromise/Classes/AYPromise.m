@@ -103,13 +103,14 @@ static id __execute__(id target, id args){
 }
 
 @interface AYPromise()
-@property (nonatomic) dispatch_queue_t barrier;
+//@property (nonatomic) dispatch_queue_t barrier;
 @property (nonatomic, strong) id value;
 @property (nonatomic, strong) NSMutableArray<AYResolve> *handlers;
 @property (nonatomic, assign) AYPromiseState state;
 @end
 
 @implementation AYPromise
+static dispatch_queue_t _barrier = nil;
 - (dispatch_queue_t)barrier{
     return _barrier ?: (_barrier = dispatch_queue_create("cn.yerl.promise.barrier", DISPATCH_QUEUE_CONCURRENT));
 }
@@ -262,7 +263,10 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
             NSAssert(isArray(promises), @"all can only hand array");
             
             __block int64_t totalCount = [promises count];
+            NSMutableArray *holders = [NSMutableArray arrayWithArray:promises];
+            
             for (__strong id promise in promises) {
+                
                 if (!isPromise(promise)) {
                     promise = AYPromise.resolve(promise);
                 }
@@ -273,11 +277,12 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
                                                 userInfo:@{NSLocalizedDescriptionKey: [result localizedDescription],
                                                            AYPromiseInternalErrorsKey: result}]);
                     }else if (OSAtomicDecrement64(&totalCount) == 0){
-                        id results = [NSMutableArray new];
-                        for (AYPromise *promise in promises) {
+                        NSMutableArray *results = [NSMutableArray new];
+                        for (AYPromise *promise in holders) {
                             id value = isPromise(promise) ? [promise value] : promise;
                             [results addObject:value ?: [NSNull null]];
                         }
+                        [holders removeAllObjects];
                         resolve(results);
                     }
                 }];
@@ -292,18 +297,23 @@ static inline AYPromise *__catch(AYPromise *self, dispatch_queue_t queue, id blo
         
         return [[AYPromise alloc] initWithResolver:^(AYResolve resolve) {
             __block int64_t totalCount = [promises count];
+            NSMutableArray *holders = [NSMutableArray arrayWithArray:promises];
+            
             for (__strong id promise in promises) {
                 if (!isPromise(promise)) {
                     promise = [[AYPromise alloc] initWithValue:promise];
                 }
+                
                 [promise pipe:^(id result) {
                     if (!isError(result)) {
+                        [holders removeAllObjects];
                         resolve(result);
-                    }else if (OSAtomicDecrement64(&totalCount) == 0){
-                        id errors = [NSMutableArray new];
-                        for (AYPromise *promise in promises) {
+                    } else if (OSAtomicDecrement64(&totalCount) == 0){
+                        NSMutableArray *errors = [NSMutableArray new];
+                        for (AYPromise *promise in holders) {
                             [errors addObject:isPromise(promise) ? [promise value] : promise];
                         }
+                        [holders removeAllObjects];
                         resolve([NSError errorWithDomain:@"cn.yerl.promise"
                                                     code:-1000
                                                 userInfo:@{NSLocalizedDescriptionKey: @"all promise were rejected",

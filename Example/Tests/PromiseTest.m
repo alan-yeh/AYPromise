@@ -158,8 +158,8 @@
 - (void)testPromiseAll{
     id ex1 = [self expectationWithDescription:@""];
     
-    AYPromise *p1 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
-        XCTAssertEqual([NSThread currentThread].isMainThread, YES);
+    AYPromise *p1 = AYPromiseAsyncWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, NO);
         resolve(@"thread1");
     });
     
@@ -168,10 +168,35 @@
         resolve(@"thread2");
     });
     
-    AYPromise.all(@[@"1", p1, p2]).then(^(NSArray<NSString *> *result){
-        BOOL isEqual = [result isEqualToArray:@[@"1", @"thread1", @"thread2"]];
+    AYPromise *p3 = AYPromiseAsyncWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, NO);
+        resolve(@"thread3");
+    });
+    
+    AYPromise *p4 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, YES);
+        resolve(@"thread4");
+    });
+    
+    AYPromise *p5 = AYPromiseAsyncWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, NO);
+        resolve(@"thread5");
+    });
+    
+    AYPromise *p6 = AYPromiseWithResolve(^(AYResolve  _Nonnull resolve) {
+        XCTAssertEqual([NSThread currentThread].isMainThread, YES);
+        resolve(@"thread6");
+    });
+    
+    AYPromise.all(@[p1, p2, p3, p4, p5, p6]).then(^(NSArray<NSString *> *result){
+        NSLog(@"%@", result);
+        BOOL isEqual = [result isEqualToArray:@[@"thread1", @"thread2", @"thread3", @"thread4", @"thread5", @"thread6"]];
         XCTAssert(isEqual);
         [ex1 fulfill];
+    }).catch(^(NSError *error){
+        NSLog(@"error");
+    }).always(^{
+        NSLog(@"always");
     });
     
     [self waitForExpectationsWithTimeout:TIME_OUT handler:nil];
